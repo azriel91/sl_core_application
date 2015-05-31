@@ -27,6 +27,15 @@ namespace sl {
 namespace core {
 namespace application {
 
+/**
+ * An activity is a particular "phase" of an application to carry out a particular action, which may or may not be interactive.
+ * For example, an activity waiting for user input to select a game mode is interactive, whereas an activity concerned with loading
+ * resources is non-interactive.
+ *
+ * Activities are not intended to be tied to any particular View, but should be extensible to load additional resources required by views.
+ * For example, an application may only require scripts to be loaded for the engine to function, but a graphical UI may also
+ * require images to be loaded, and these should be loaded before the engine continues to the next activity.
+ */
 class SL_CORE_APPLICATION_EXPORT Activity {
 public:
 	Activity();
