@@ -33,4 +33,13 @@
 #define SL_CORE_APPLICATION_EXPORT US_ABI_EXPORT
 #endif
 
+namespace sl {
+namespace core {
+namespace application {
+} /* namespace application */
+} /* namespace core */
+} /* namespace sl */
+
+namespace ns = sl::core::application;
+
 #endif /* __SL_CORE_APPLICATION__BLOCK_H */

@@ -31,7 +31,6 @@ namespace sl {
 namespace core {
 namespace application {
 
-namespace ns = sl::core::application;
 typedef std::shared_ptr<ns::Activity> ActivityPointer;
 typedef std::stack<ns::ActivityPointer> ActivityStack;
 
@@ -45,6 +44,13 @@ private:
 public:
 	Application(std::shared_ptr<ns::ActivityStack> activityStack);
 	virtual ~Application();
+
+	/**
+	 * Run this application.
+	 *
+	 * @return the exit code
+	 */
+	const int run();
 
 private:
 	Application(const Application& other) = delete; // disable copy

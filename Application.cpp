@@ -32,6 +32,69 @@ Application::Application(std::shared_ptr<ns::ActivityStack> activityStack) :
 Application::~Application() {
 }
 
+const int Application::run() {
+	auto exitCode = Activity::ExitCode::NONE;
+	while(!this->activityStack->empty()) {
+		this->currentActivity = this->activityStack->top();
+		exitCode = this->currentActivity->run();
+
+		switch(exitCode) {
+			case Activity::ExitCode::FAIL:
+				this->activityStack->pop();
+				break;
+			case Activity::ExitCode::NONE:
+				this->activityStack->pop();
+				break;
+			case Activity::ExitCode::SUCCESS:
+				this->activityStack->pop();
+				break;
+			case Activity::ExitCode::STACK:
+				{
+					auto nextActivity = this->currentActivity->getNextActivity();
+					if (nextActivity) {
+						this->activityStack->push(nextActivity);
+					} else {
+						// null ptr
+						return 1002;
+					}
+				}
+				break;
+			case Activity::ExitCode::REPLACE:
+				{
+					auto nextActivity = this->currentActivity->getNextActivity();
+					if (nextActivity) {
+						this->activityStack->pop();
+						this->activityStack->push(nextActivity);
+					} else {
+						// null ptr
+						return 1003;
+					}
+				}
+				break;
+			case Activity::ExitCode::EXTERNAL_REQUEST:
+				this->activityStack->pop();
+				break;
+			default: // never reached
+				break;
+		}
+	}
+
+	switch(exitCode) {
+		case Activity::ExitCode::FAIL:
+			return -1001;
+		case Activity::ExitCode::NONE:
+			return 1000;
+		case Activity::ExitCode::SUCCESS:
+			return 0;
+		case Activity::ExitCode::EXTERNAL_REQUEST:
+			return 1004;
+		default:
+			break;
+	}
+
+	return 999; // should never be reached
+}
+
 } /* namespace application */
 } /* namespace core */
 } /* namespace sl */

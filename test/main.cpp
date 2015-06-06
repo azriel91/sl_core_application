@@ -22,6 +22,9 @@
 #include <stack>
 #include <string>
 #include <google/gtest/gtest.h>
+#include <google/gmock/gmock.h>
+
+#include "TestConfig.h"
 
 #ifdef US_BUILD_SHARED_LIBS
 	#include <azriel/usbundleloader/BundleLoader.h>
@@ -33,7 +36,6 @@
 
 #include "../Activity.h"
 #include "../Application.h"
-#include "TestConfig.h"
 
 #ifdef US_PLATFORM_WINDOWS
 	static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
@@ -41,17 +43,134 @@
 	static const std::string LIB_PATH = US_LIBRARY_OUTPUT_DIRECTORY;
 #endif
 
+using ::testing::Return;
+using ::testing::InSequence;
+
 namespace sl {
 namespace core {
 namespace application {
 
-namespace ns = sl::core::application;
+class MockActivity : public Activity {
+public:
+	MockActivity(std::shared_ptr<ns::Activity> nextActivity = std::shared_ptr<ns::Activity>()) {
+		setNextActivity(nextActivity);
+	}
+	virtual ~MockActivity() {}
 
-TEST(Application, exitsWhenNoActivitiesProvided) {
+	MOCK_METHOD0(run, ExitCode());
+};
+
+class ApplicationTest : public testing::Test {
+protected:
+	std::shared_ptr<MockActivity> activity;
+	std::shared_ptr<MockActivity> activityWithNext;
+
+	virtual void SetUp() {
+		activity.reset(new MockActivity());
+		activityWithNext.reset(new MockActivity(activity));
+	}
+
+	virtual void TearDown() {
+	}
+};
+
+TEST_F(ApplicationTest, exitsWith_ExitCode1001_WhenNoActivitiesProvided) {
 	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	ns::Application application(activityStack);
 
-	auto application = new ns::Application(activityStack);
-	delete application;
+	EXPECT_EQ(1000, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCode0_WhenLastActivityEndsSuccessfully) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(0, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCodeN1001_WhenLastActivityEndsWithFailure) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::FAIL));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(-1001, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCode1000_WhenActivityEndsWithNone) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::NONE));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(1000, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCode1002_WhenActivityEndsWith_Stack_ButDoesNotProvideNextActivity) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::STACK));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(1002, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCode1003_WhenActivityEndsWith_Replace_ButDoesNotProvideNextActivity) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::REPLACE));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(1003, application.run());
+}
+
+TEST_F(ApplicationTest, exitsWith_ExitCode1004_WhenLastActivityEndsDueToExternalRequest) {
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::EXTERNAL_REQUEST));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(1004, application.run());
+}
+
+TEST_F(ApplicationTest, stacksNextActivityAndReturnsToPreviousActivity) {
+	{
+		InSequence sequence;
+		EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::STACK));
+		EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
+		EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
+	}
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activityWithNext);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(0, application.run());
+}
+
+TEST_F(ApplicationTest, replacesActivityWithNextActivity) {
+	EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::REPLACE));
+	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activityWithNext);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(0, application.run());
+}
+
+TEST_F(ApplicationTest, runsPreviousActivityWhenActivityEndsDueToExternalRequest) {
+	{
+		InSequence sequence;
+		EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::EXTERNAL_REQUEST));
+		EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
+	}
+	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	activityStack->push(this->activityWithNext);
+	activityStack->push(this->activity);
+	ns::Application application(activityStack);
+
+	EXPECT_EQ(0, application.run());
 }
 
 } /* namespace application */
@@ -59,6 +178,6 @@ TEST(Application, exitsWhenNoActivitiesProvided) {
 } /* namespace sl */
 
 int main(int argc, char **argv) {
-	testing::InitGoogleTest(&argc, argv);
+	::testing::InitGoogleMock(&argc, argv);
 	return RUN_ALL_TESTS();
 }
