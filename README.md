@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/azriel91/sl_core_application.svg?branch=master)](https://travis-ci.org/azriel91/sl_cmake) [![Build Status](https://webapi.biicode.com/v1/badges/azriel/azriel/sl_core_application/master)](https://www.biicode.com/azriel/sl_core_application)
+[![Build Status](https://travis-ci.org/azriel91/sl_core_application.svg?branch=master)](https://travis-ci.org/azriel91/sl_cmake) [![Build status](https://ci.appveyor.com/api/projects/status/bu80gjcrjk8lqr2v/branch/master?svg=true)](https://ci.appveyor.com/project/azriel91/sl-core-application/branch/master) [![Build Status](https://webapi.biicode.com/v1/badges/azriel/azriel/sl_core_application/master)](https://www.biicode.com/azriel/sl_core_application)
 
 ## sl\_core\_application
 
