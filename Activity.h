@@ -23,7 +23,7 @@
 
 #include <memory>
 
-#include "Block.h"
+#include "sl_core_application/Block.h"
 
 namespace sl {
 namespace core {
