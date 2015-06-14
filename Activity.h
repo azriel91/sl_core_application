@@ -57,7 +57,7 @@ public:
 	};
 
 private:
-	std::shared_ptr<ns::Activity> nextActivity;
+	std::shared_ptr<sl::core::application::Activity> nextActivity;
 
 public:
 	Activity();
@@ -66,10 +66,10 @@ public:
 	/** Runs this activity */
 	virtual ExitCode run() = 0;
 
-	std::shared_ptr<ns::Activity> getNextActivity() const;
+	std::shared_ptr<sl::core::application::Activity> getNextActivity() const;
 
 protected:
-	void setNextActivity(std::shared_ptr<ns::Activity> nextActivity);
+	void setNextActivity(std::shared_ptr<sl::core::application::Activity> nextActivity);
 };
 
 } /* namespace application */

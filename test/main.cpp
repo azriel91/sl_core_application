@@ -52,7 +52,8 @@ namespace application {
 
 class MockActivity : public Activity {
 public:
-	MockActivity(std::shared_ptr<ns::Activity> nextActivity = std::shared_ptr<ns::Activity>()) {
+	MockActivity(std::shared_ptr<sl::core::application::Activity> nextActivity =
+			std::shared_ptr<sl::core::application::Activity>()) {
 		setNextActivity(nextActivity);
 	}
 	virtual ~MockActivity() {}
@@ -75,62 +76,62 @@ protected:
 };
 
 TEST_F(ApplicationTest, exitsWith_ExitCode1001_WhenNoActivitiesProvided) {
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
-	ns::Application application(activityStack);
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(1000, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCode0_WhenLastActivityEndsSuccessfully) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(0, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCodeN1001_WhenLastActivityEndsWithFailure) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::FAIL));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(-1001, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCode1000_WhenActivityEndsWithNone) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::NONE));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(1000, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCode1002_WhenActivityEndsWith_Stack_ButDoesNotProvideNextActivity) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::STACK));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(1002, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCode1003_WhenActivityEndsWith_Replace_ButDoesNotProvideNextActivity) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::REPLACE));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(1003, application.run());
 }
 
 TEST_F(ApplicationTest, exitsWith_ExitCode1004_WhenLastActivityEndsDueToExternalRequest) {
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::EXTERNAL_REQUEST));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(1004, application.run());
 }
@@ -142,9 +143,9 @@ TEST_F(ApplicationTest, stacksNextActivityAndReturnsToPreviousActivity) {
 		EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
 		EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
 	}
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activityWithNext);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(0, application.run());
 }
@@ -152,9 +153,9 @@ TEST_F(ApplicationTest, stacksNextActivityAndReturnsToPreviousActivity) {
 TEST_F(ApplicationTest, replacesActivityWithNextActivity) {
 	EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::REPLACE));
 	EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activityWithNext);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(0, application.run());
 }
@@ -165,10 +166,10 @@ TEST_F(ApplicationTest, runsPreviousActivityWhenActivityEndsDueToExternalRequest
 		EXPECT_CALL(*this->activity, run()).WillOnce(Return(Activity::ExitCode::EXTERNAL_REQUEST));
 		EXPECT_CALL(*this->activityWithNext, run()).WillOnce(Return(Activity::ExitCode::SUCCESS));
 	}
-	std::shared_ptr<ns::ActivityStack> activityStack(new ns::ActivityStack());
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack(new sl::core::application::ActivityStack());
 	activityStack->push(this->activityWithNext);
 	activityStack->push(this->activity);
-	ns::Application application(activityStack);
+	sl::core::application::Application application(activityStack);
 
 	EXPECT_EQ(0, application.run());
 }

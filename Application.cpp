@@ -24,9 +24,9 @@ namespace sl {
 namespace core {
 namespace application {
 
-Application::Application(std::shared_ptr<ns::ActivityStack> activityStack) :
+Application::Application(std::shared_ptr<sl::core::application::ActivityStack> activityStack) :
 		activityStack(activityStack),
-		currentActivity(std::shared_ptr<ns::Activity>(nullptr)) {
+		currentActivity(std::shared_ptr<sl::core::application::Activity>(nullptr)) {
 }
 
 Application::~Application() {

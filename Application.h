@@ -31,18 +31,18 @@ namespace sl {
 namespace core {
 namespace application {
 
-typedef std::shared_ptr<ns::Activity> ActivityPointer;
-typedef std::stack<ns::ActivityPointer> ActivityStack;
+typedef std::shared_ptr<sl::core::application::Activity> ActivityPointer;
+typedef std::stack<sl::core::application::ActivityPointer> ActivityStack;
 
 class SL_CORE_APPLICATION_EXPORT Application {
 private:
 	/** The activity stack */
-	std::shared_ptr<ns::ActivityStack> activityStack;
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack;
 	/** The currently active activity */
-	std::shared_ptr<ns::Activity> currentActivity;
+	std::shared_ptr<sl::core::application::Activity> currentActivity;
 
 public:
-	Application(std::shared_ptr<ns::ActivityStack> activityStack);
+	Application(std::shared_ptr<sl::core::application::ActivityStack> activityStack);
 	virtual ~Application();
 
 	/**
