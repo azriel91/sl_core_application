@@ -24,10 +24,19 @@ namespace sl {
 namespace core {
 namespace application {
 
-Activity::Activity() {
+Activity::Activity() :
+		nextActivity(std::shared_ptr<sl::core::application::Activity>()) {
 }
 
 Activity::~Activity() {
+}
+
+std::shared_ptr<sl::core::application::Activity> Activity::getNextActivity() const {
+	return this->nextActivity;
+}
+
+void Activity::setNextActivity(std::shared_ptr<sl::core::application::Activity> nextActivity) {
+	this->nextActivity = nextActivity;
 }
 
 } /* namespace application */

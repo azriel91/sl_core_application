@@ -25,26 +25,32 @@
 #include <stack>
 
 #include "Activity.h"
-#include "Block.h"
+#include "sl_core_application/Block.h"
 
 namespace sl {
 namespace core {
 namespace application {
 
-namespace ns = sl::core::application;
-typedef std::shared_ptr<ns::Activity> ActivityPointer;
-typedef std::stack<ns::ActivityPointer> ActivityStack;
+typedef std::shared_ptr<sl::core::application::Activity> ActivityPointer;
+typedef std::stack<sl::core::application::ActivityPointer> ActivityStack;
 
 class SL_CORE_APPLICATION_EXPORT Application {
 private:
 	/** The activity stack */
-	std::shared_ptr<ns::ActivityStack> activityStack;
+	std::shared_ptr<sl::core::application::ActivityStack> activityStack;
 	/** The currently active activity */
-	std::shared_ptr<ns::Activity> currentActivity;
+	std::shared_ptr<sl::core::application::Activity> currentActivity;
 
 public:
-	Application(std::shared_ptr<ns::ActivityStack> activityStack);
+	Application(std::shared_ptr<sl::core::application::ActivityStack> activityStack);
 	virtual ~Application();
+
+	/**
+	 * Run this application.
+	 *
+	 * @return the exit code
+	 */
+	const int run();
 
 private:
 	Application(const Application& other) = delete; // disable copy
