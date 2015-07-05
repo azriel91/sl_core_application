@@ -23,6 +23,8 @@
 #include <string>
 #include <google/gtest/gtest.h>
 
+#include "TestConfig.h"
+
 #ifdef US_BUILD_SHARED_LIBS
 	#include <azriel/usbundleloader/BundleLoader.h>
 #else
@@ -33,7 +35,6 @@
 
 #include "../Activity.h"
 #include "../Application.h"
-#include "TestConfig.h"
 
 #ifdef US_PLATFORM_WINDOWS
 	static const std::string LIB_PATH = US_RUNTIME_OUTPUT_DIRECTORY;
