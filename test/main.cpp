@@ -26,8 +26,6 @@
 
 #include "TestConfig.h"
 
-#include "TestConfig.h"
-
 #ifdef US_BUILD_SHARED_LIBS
 	#include <azriel/usbundleloader/BundleLoader.h>
 #else
