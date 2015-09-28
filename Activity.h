@@ -72,6 +72,8 @@ protected:
 	void setNextActivity(std::shared_ptr<sl::core::application::Activity> nextActivity);
 };
 
+typedef std::shared_ptr<sl::core::application::Activity> ActivityPointer;
+
 } /* namespace application */
 } /* namespace core */
 } /* namespace sl */

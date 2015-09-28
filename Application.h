@@ -31,7 +31,6 @@ namespace sl {
 namespace core {
 namespace application {
 
-typedef std::shared_ptr<sl::core::application::Activity> ActivityPointer;
 typedef std::stack<sl::core::application::ActivityPointer> ActivityStack;
 
 class SL_CORE_APPLICATION_EXPORT Application {
